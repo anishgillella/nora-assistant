@@ -1,0 +1,112 @@
+[
+  {
+    "title": "Nike Vomero Plus - Running Shoes",
+    "url": "https://nike.com/vomero",
+    "domain": "nike.com",
+    "product": {
+      "name": "Nike Vomero Plus",
+      "brand": "Nike",
+      "price": 160,
+      "category": "shoes"
+    }
+  },
+  {
+    "title": "Allbirds Wool Runner NZ",
+    "url": "https://allbirds.com/wool-runner",
+    "domain": "allbirds.com",
+    "product": {
+      "name": "Wool Runner NZ",
+      "brand": "Allbirds",
+      "price": 110,
+      "category": "shoes"
+    }
+  },
+  {
+    "title": "Adidas Ultraboost 5X",
+    "url": "https://adidas.com/ultraboost",
+    "domain": "adidas.com",
+    "product": {
+      "name": "Ultraboost 5X",
+      "brand": "Adidas",
+      "price": 190,
+      "category": "shoes"
+    }
+  },
+  {
+    "title": "Nike Air Max 90",
+    "url": "https://nike.com/air-max-90",
+    "domain": "nike.com",
+    "product": {
+      "name": "Nike Air Max 90",
+      "brand": "Nike",
+      "price": 130,
+      "category": "shoes"
+    }
+  },
+  {
+    "title": "Hoka Clifton 9",
+    "url": "https://hoka.com/clifton-9",
+    "domain": "hoka.com",
+    "product": {
+      "name": "Hoka Clifton 9",
+      "brand": "Hoka",
+      "price": 145,
+      "category": "shoes"
+    }
+  },
+  {
+    "title": "On Cloud 5",
+    "url": "https://on-running.com/cloud-5",
+    "domain": "on-running.com",
+    "product": {
+      "name": "On Cloud 5",
+      "brand": "On Running",
+      "price": 150,
+      "category": "shoes"
+    }
+  },
+  {
+    "title": "Lululemon ABC Jogger",
+    "url": "https://lululemon.com/abc-jogger",
+    "domain": "lululemon.com",
+    "product": {
+      "name": "ABC Jogger",
+      "brand": "Lululemon",
+      "price": 128,
+      "category": "clothing"
+    }
+  },
+  {
+    "title": "Patagonia Better Sweater",
+    "url": "https://patagonia.com/better-sweater",
+    "domain": "patagonia.com",
+    "product": {
+      "name": "Better Sweater",
+      "brand": "Patagonia",
+      "price": 139,
+      "category": "clothing"
+    }
+  },
+  {
+    "title": "North Face Thermoball Jacket",
+    "url": "https://thenorthface.com/thermoball",
+    "domain": "thenorthface.com",
+    "product": {
+      "name": "Thermoball Jacket",
+      "brand": "The North Face",
+      "price": 230,
+      "category": "outdoor"
+    }
+  },
+  {
+    "title": "Vuori Kore Short",
+    "url": "https://vuori.com/kore-short",
+    "domain": "vuori.com",
+    "product": {
+      "name": "Kore Short",
+      "brand": "Vuori",
+      "price": 68,
+      "category": "fitness"
+    }
+  }
+]

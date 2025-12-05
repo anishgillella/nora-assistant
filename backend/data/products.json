@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Women's Tree Dasher 2",
+    "brand": "Allbirds",
+    "price": 94,
+    "category": "shoes",
+    "description": "Responsive foam and extra grip for active use"
+  },
+  {
+    "name": "The Royale 2.0 - Matte Black",
+    "brand": "Greats",
+    "price": 138.99,
+    "category": "shoes",
+    "description": "Classic sneaker epitome of effortless cool"
+  },
+  {
+    "name": "The Royale 2.0 - Crazy Horse Brown",
+    "brand": "Greats",
+    "price": 149.99,
+    "category": "shoes",
+    "description": "Premium leather sneaker"
+  },
+  {
+    "name": "LightSpeed Minimal 3\" Skort CL",
+    "brand": "Outdoor Voices",
+    "price": 19.95,
+    "category": "fitness",
+    "description": "Phone pocket and built-in shorts"
+  },
+  {
+    "name": "Quilted Reynard Crew",
+    "brand": "tentree",
+    "price": 88,
+    "category": "clothing",
+    "description": "Perfect for layering with quilted design"
+  },
+  {
+    "name": "Women's Corbet Quilted Crewneck",
+    "brand": "Marine Layer",
+    "price": 98,
+    "category": "clothing",
+    "description": "Cozy feel with sleek design"
+  },
+  {
+    "name": "Up and Up Pullover Hoodie",
+    "brand": "Cotopaxi",
+    "price": 42.5,
+    "category": "clothing",
+    "description": "Great for outdoor activities"
+  },
+  {
+    "name": "Chalet Knit Hoodie",
+    "brand": "Marine Layer",
+    "price": 188,
+    "category": "clothing",
+    "description": "Unique knit design that stands out"
+  },
+  {
+    "name": "The Ravine - Matte Black",
+    "brand": "Greats",
+    "price": 146.99,
+    "category": "shoes",
+    "description": "Modern light hiker for city and outdoor"
+  },
+  {
+    "name": "TreeFleece Golden Spruce Hoodie",
+    "brand": "tentree",
+    "price": 46.8,
+    "category": "clothing",
+    "description": "Eco-friendly sustainable materials"
+  }
+]
