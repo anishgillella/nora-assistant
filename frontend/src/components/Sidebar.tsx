@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { MemoryStats } from '../types';
 import { memoryApi, recommendationsApi } from '../services/api';
-import { Database, RefreshCw, Download, Upload, BarChart3, Package, Layers, Clock } from 'lucide-react';
+import { Database, RefreshCw, Download, Upload, BarChart3, Package, Sparkles } from 'lucide-react';
+import { ProfileModal } from './ProfileModal';
 
 interface SidebarProps {
     onViewChange: (view: 'chat' | 'explorer') => void;
@@ -12,6 +13,7 @@ export function Sidebar({ onViewChange, currentView }: SidebarProps) {
     const [stats, setStats] = useState<MemoryStats | null>(null);
     const [isImporting, setIsImporting] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     useEffect(() => {
         loadStats();
@@ -68,7 +70,15 @@ export function Sidebar({ onViewChange, currentView }: SidebarProps) {
                     </div>
                 </div>
 
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Memory Stats</h2>
+                <button
+                    onClick={() => setIsProfileOpen(true)}
+                    className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm"
+                >
+                    <Sparkles className="w-4 h-4" />
+                    <span className="text-sm font-medium">Personalize Experience</span>
+                </button>
+
+                <h2 className="text-sm font-semibold text-gray-900 mb-3 mt-6">Memory Stats</h2>
                 <div className="space-y-2">
                     <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
                         <Database className="w-5 h-5 text-blue-600" />
@@ -84,15 +94,10 @@ export function Sidebar({ onViewChange, currentView }: SidebarProps) {
                             <p className="text-lg font-semibold text-gray-900">{stats?.products_count || 0}</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                        <Layers className="w-5 h-5 text-green-600" />
-                        <div className="flex-1">
-                            <p className="text-xs text-gray-600">Total Vectors</p>
-                            <p className="text-lg font-semibold text-gray-900">{stats?.total_vectors || 0}</p>
-                        </div>
-                    </div>
                 </div>
             </div>
+
+            <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
 
             {/* Data Management */}
             <div className="p-6 border-b border-gray-200">
@@ -135,8 +140,8 @@ export function Sidebar({ onViewChange, currentView }: SidebarProps) {
                     <button
                         onClick={() => onViewChange('chat')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'chat'
-                                ? 'bg-blue-100 text-blue-700'
-                                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
                             }`}
                     >
                         <BarChart3 className="w-4 h-4" />
@@ -145,8 +150,8 @@ export function Sidebar({ onViewChange, currentView }: SidebarProps) {
                     <button
                         onClick={() => onViewChange('explorer')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'explorer'
-                                ? 'bg-blue-100 text-blue-700'
-                                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
                             }`}
                     >
                         <Database className="w-4 h-4" />

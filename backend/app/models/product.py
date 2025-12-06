@@ -34,7 +34,17 @@ class Product(BaseModel):
     # Additional fields
     tags: List[str] = Field(default_factory=list)
     variants: List[str] = Field(default_factory=list)
+    variants: List[str] = Field(default_factory=list)
     availability: str = "in_stock"
+    
+    # Rich Attributes (mirrors ProductInfo)
+    visual_characteristics: List[str] = Field(default_factory=list)
+    materials: List[str] = Field(default_factory=list)
+    occasion: List[str] = Field(default_factory=list)
+    gender_target: Optional[str] = None
+    season: List[str] = Field(default_factory=list)
+    sustainability: List[str] = Field(default_factory=list)
+    color_family: List[str] = Field(default_factory=list)
     
     # Metadata
     metadata: dict = Field(default_factory=dict)

@@ -13,6 +13,8 @@ from openai import OpenAI
 from app.services.rag_engine import RAGEngine
 from app.utils.config import get_settings
 from app.utils.token_utils import get_tracker
+# Import profile module to access global state
+from app.api import profile
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
@@ -40,7 +42,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     response: str
-    query_type: str
+    query_type: Optional[str] = None  # Removed - let LLM handle intent
     sources: Dict[str, Any]
 
 
@@ -57,14 +59,21 @@ async def chat(request: ChatRequest):
                 for msg in request.conversation_history
             ]
         
+        # Get current user profile
+        # Get current user profile (optional - continue without if not available)
+        try:
+            current_profile = profile.load_profile()
+        except Exception:
+            current_profile = None
+        
         result = rag.chat(
             query=request.message,
-            conversation_history=history
+            conversation_history=history,
+            user_profile=current_profile
         )
         
         return ChatResponse(
             response=result["response"],
-            query_type=result["query_type"],
             sources=result["sources"]
         )
     except Exception as e:
@@ -89,27 +98,30 @@ async def chat_stream(request: ChatRequest):
                     for msg in request.conversation_history
                 ]
             
-            # 1. LLM-based query rewriting (no hardcoded keywords)
-            rewrite = rag.rewrite_query(request.message, history)
-            yield f"data: {json.dumps({'type': 'rewrite', 'original': request.message, 'rewritten': rewrite.rewritten_query, 'intent': rewrite.intent})}\n\n"
+            # Get current user profile
+            # Get current user profile (optional - continue without if not available)
+            try:
+                current_profile = profile.load_profile()
+            except Exception:
+                current_profile = None
             
-            # 2. Hybrid retrieval with rewritten query
-            browsing, products = rag.retrieve_context(
-                query=request.message,
-                rewritten_query=rewrite.rewritten_query,
-                category=rewrite.product_category
+            # 1. Direct embedding search
+            yield f"data: {json.dumps({'type': 'start', 'query': request.message})}\n\n"
+            
+            browsing, products = rag.retrieve(
+                query=request.message, 
+                user_profile=current_profile
             )
             yield f"data: {json.dumps({'type': 'sources', 'browsing': len(browsing), 'products': len(products)})}\n\n"
             
-            # 3. Format context
-            context = rag.format_context(browsing, products)
+            # 2. Format context
+            context = rag.format_context(browsing, products, user_profile=current_profile)
             
-            # 4. Generate response with LLM-selected products
-            response_text, selected_products = rag.generate_response_with_products(
+            # 3. Generate response with LLM-selected products
+            response_text, selected_products = rag.generate_response(
                 query=request.message,
                 context=context,
                 products=products,
-                intent=rewrite.intent,
                 conversation_history=history
             )
             
@@ -120,9 +132,11 @@ async def chat_stream(request: ChatRequest):
                 await asyncio.sleep(0.01)
             
             # Send completion with LLM-selected products
-            yield f"data: {json.dumps({'type': 'done', 'full_response': response_text, 'browsing': browsing[:3], 'products': selected_products, 'intent': rewrite.intent})}\n\n"
+            yield f"data: {json.dumps({'type': 'done', 'full_response': response_text, 'browsing': browsing[:3], 'products': selected_products})}\n\n"
             
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
     
     return StreamingResponse(

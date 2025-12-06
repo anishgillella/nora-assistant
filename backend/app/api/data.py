@@ -133,6 +133,73 @@ async def get_categories():
     return {"categories": []}
 
 
+@router.post("/sync")
+async def sync_from_pinecone():
+    """
+    Sync data from Pinecone to local JSON files.
+    This ensures Data Explorer shows all vectors from the database.
+    """
+    store = PineconeStore()
+    
+    # Fetch all browsing entries
+    browsing_data = store.list_all_browsing(limit=500)
+    browsing_file = get_browsing_file_path()
+    with open(browsing_file, "w") as f:
+        json.dump(browsing_data, f, indent=2, default=str)
+    
+    # Fetch all products
+    products_data = store.list_all_products(limit=500)
+    products_file = get_products_file_path()
+    with open(products_file, "w") as f:
+        json.dump(products_data, f, indent=2, default=str)
+    
+    store.close()
+    
+    return {
+        "status": "success",
+        "browsing_synced": len(browsing_data),
+        "products_synced": len(products_data),
+        "message": f"Synced {len(browsing_data)} browsing entries and {len(products_data)} products"
+    }
+
+
+@router.get("/debug-stats")
+async def debug_stats():
+    """Debug endpoint to check Pinecone index stats"""
+    store = PineconeStore()
+    stats = store.index.describe_index_stats()
+    
+    # Also try a test query in each namespace
+    dummy_vector = [0.0] * store.embeddings.dimension
+    
+    browsing_results = store.index.query(
+        vector=dummy_vector,
+        top_k=10,
+        namespace=store.NS_BROWSING,
+        include_metadata=True
+    )
+    
+    products_results = store.index.query(
+        vector=dummy_vector,
+        top_k=10,
+        namespace=store.NS_PRODUCTS,
+        include_metadata=True
+    )
+    
+    store.close()
+    
+    return {
+        "index_stats": {
+            "total_vectors": stats.total_vector_count,
+            "namespaces": {ns: data.vector_count for ns, data in stats.namespaces.items()} if stats.namespaces else {}
+        },
+        "browsing_query_results": len(browsing_results.matches),
+        "products_query_results": len(products_results.matches),
+        "NS_BROWSING": store.NS_BROWSING,
+        "NS_PRODUCTS": store.NS_PRODUCTS
+    }
+
+
 def save_browsing_data(data: List[Dict]):
     """Save browsing data to JSON file."""
     file_path = get_browsing_file_path()

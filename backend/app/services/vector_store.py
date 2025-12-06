@@ -52,22 +52,25 @@ class PineconeStore:
         """
         Upsert browsing history entries to the browsing-memory namespace
         
-        Args:
-            entries: List of dicts with url, title, product_info, etc.
-        
-        Returns:
-            Number of vectors upserted
+        Now supports BrowsingActivity schema with semantic_summary and visit_timestamp.
         """
         if not entries:
             return 0
         
         # Create text representations for embedding
+        # Prioritize semantic_summary if available, fallback to legacy format
         texts = []
         for e in entries:
-            text = f"{e.get('title', '')} {e.get('url', '')}"
-            if e.get('product'):
+            if e.get('semantic_summary'):
+                # New BrowsingActivity format - use semantic_summary
+                text = e['semantic_summary']
+            elif e.get('product'):
+                # Legacy product format
                 p = e['product']
-                text += f" {p.get('name', '')} {p.get('brand', '')} {p.get('category', '')} ${p.get('price', 0)}"
+                text = f"{e.get('title', '')} {p.get('name', '')} {p.get('brand', '')} {p.get('category', '')} ${p.get('price', 0)}"
+            else:
+                # Fallback
+                text = f"{e.get('title', '')} {e.get('url', '')}"
             texts.append(text)
         
         # Generate embeddings
@@ -77,19 +80,49 @@ class PineconeStore:
         vectors = []
         for i, entry in enumerate(entries):
             vector_id = entry.get('id') or str(uuid.uuid4())
+            
+            # Build metadata - handle both new and legacy formats
+            metadata = {
+                "url": entry.get("url", ""),
+                "title": entry.get("title", ""),
+                "domain": entry.get("domain", ""),
+                "visit_time": str(entry.get("visit_time", "")),
+            }
+            
+            # New BrowsingActivity fields
+            if entry.get("visit_timestamp"):
+                metadata["visit_timestamp"] = entry["visit_timestamp"]  # Numeric for filtering
+            if entry.get("activity_type"):
+                metadata["activity_type"] = entry["activity_type"]
+            if entry.get("category"):
+                metadata["category"] = entry["category"]
+            if entry.get("topics"):
+                metadata["topics"] = ",".join(entry["topics"])  # Pinecone doesn't support lists well, join
+            if entry.get("context"):
+                metadata["context"] = ",".join(entry["context"])
+            if entry.get("vibe"):
+                metadata["vibe"] = ",".join(entry["vibe"])
+            if entry.get("inferred_needs"):
+                metadata["inferred_needs"] = ",".join(entry["inferred_needs"])
+            if entry.get("semantic_summary"):
+                metadata["semantic_summary"] = entry["semantic_summary"][:500]  # Truncate for Pinecone limits
+            if entry.get("brand"):
+                metadata["brand"] = entry["brand"]
+            if entry.get("price"):
+                metadata["price"] = entry["price"]
+            
+            # Legacy product fields (backward compatibility)
+            if entry.get("product"):
+                p = entry["product"]
+                metadata["product_name"] = p.get("name", "")
+                metadata["product_price"] = p.get("price", 0)
+                metadata["product_category"] = p.get("category", "")
+                metadata["product_brand"] = p.get("brand", "")
+            
             vectors.append({
                 "id": vector_id,
                 "values": embeddings[i],
-                "metadata": {
-                    "url": entry.get("url", ""),
-                    "title": entry.get("title", ""),
-                    "domain": entry.get("domain", ""),
-                    "visit_time": str(entry.get("visit_time", "")),
-                    "product_name": entry.get("product", {}).get("name", ""),
-                    "product_price": entry.get("product", {}).get("price", 0),
-                    "product_category": entry.get("product", {}).get("category", ""),
-                    "product_brand": entry.get("product", {}).get("brand", ""),
-                }
+                "metadata": metadata
             })
         
         # Upsert in batches of 100
@@ -97,6 +130,7 @@ class PineconeStore:
         for i in range(0, len(vectors), batch_size):
             batch = vectors[i:i + batch_size]
             self.index.upsert(vectors=batch, namespace=self.NS_BROWSING)
+        
         
         return len(vectors)
     
@@ -116,8 +150,21 @@ class PineconeStore:
         # Create text representations
         texts = []
         for p in products:
+            # Base features
             text = f"{p.get('name', '')} {p.get('brand', '')} {p.get('category', '')} "
             text += f"{p.get('description', '')} ${p.get('price', 0)}"
+            
+            # Add Rich Attributes tokens to embedding text
+            rich_features = []
+            if p.get('materials'): rich_features.extend(p['materials'])
+            if p.get('visual_characteristics'): rich_features.extend(p['visual_characteristics'])
+            if p.get('occasion'): rich_features.extend(p['occasion'])
+            if p.get('gender_target'): rich_features.append(p['gender_target'])
+            if p.get('sustainability'): rich_features.extend(p['sustainability'])
+            
+            if rich_features:
+                text += f" {' '.join(rich_features)}"
+                
             if p.get('tags'):
                 text += f" {' '.join(p['tags'][:5])}"
             texts.append(text)
@@ -138,10 +185,15 @@ class PineconeStore:
                     "currency": p.get("currency", "USD"),
                     "category": str(p.get("category", "")),
                     "brand": p.get("brand", ""),
-                    "description": p.get("description", "")[:200],
+                    "description": p.get("description", "")[:500],
                     "image_url": p.get("image_url", ""),
                     "product_url": p.get("product_url", ""),
                     "store_name": p.get("store_name", ""),
+                    # Store rich attributes in metadata for potential future filtering
+                    "materials": p.get("materials", []),
+                    "occasion": p.get("occasion", []),
+                    "visual_characteristics": p.get("visual_characteristics", []),
+                    "gender_target": p.get("gender_target") or "",
                 }
             })
         
@@ -243,6 +295,81 @@ class PineconeStore:
                 for ns, data in stats.namespaces.items()
             }
         }
+    
+    def list_all_browsing(self, limit: int = 500) -> List[Dict]:
+        """List all browsing entries from Pinecone"""
+        # Use a dummy query to get results (Pinecone doesn't have a list operation)
+        # We'll use a zero vector to get random results
+        dummy_vector = [0.0] * self.embeddings.dimension
+        
+        results = self.index.query(
+            vector=dummy_vector,
+            top_k=limit,
+            namespace=self.NS_BROWSING,
+            include_metadata=True
+        )
+        
+        items = []
+        for match in results.matches:
+            meta = match.metadata or {}
+            items.append({
+                "id": match.id,
+                "url": meta.get("url", ""),
+                "title": meta.get("title", ""),
+                "domain": meta.get("domain", ""),
+                "visit_time": meta.get("visit_time", ""),
+                # New unified fields
+                "activity_type": meta.get("activity_type", ""),
+                "category": meta.get("category", ""),
+                "topics": meta.get("topics", "").split(",") if meta.get("topics") else [],
+                "context": meta.get("context", "").split(",") if meta.get("context") else [],
+                "vibe": meta.get("vibe", "").split(",") if meta.get("vibe") else [],
+                "inferred_needs": meta.get("inferred_needs", "").split(",") if meta.get("inferred_needs") else [],
+                "semantic_summary": meta.get("semantic_summary", ""),
+                "brand": meta.get("brand", ""),
+                "price": meta.get("price", 0),
+                # Legacy fields for backward compatibility
+                "product_name": meta.get("product_name", ""),
+                "product_price": meta.get("product_price", 0),
+                "product_category": meta.get("product_category", ""),
+                "product_brand": meta.get("product_brand", ""),
+            })
+        return items
+    
+    def list_all_products(self, limit: int = 500) -> List[Dict]:
+        """List all products from Pinecone"""
+        dummy_vector = [0.0] * self.embeddings.dimension
+        
+        results = self.index.query(
+            vector=dummy_vector,
+            top_k=limit,
+            namespace=self.NS_PRODUCTS,
+            include_metadata=True
+        )
+        
+        items = []
+        for match in results.matches:
+            meta = match.metadata or {}
+            items.append({
+                "id": match.id,
+                "name": meta.get("name", ""),
+                "brand": meta.get("brand", ""),
+                "category": meta.get("category", ""),
+                "price": meta.get("price", 0),
+                "description": meta.get("description", ""),
+                "image_url": meta.get("image_url", ""),
+                "product_url": meta.get("product_url", ""),
+                "store_name": meta.get("store_name", ""),
+                # Rich attributes
+                "materials": meta.get("materials", []),
+                "occasion": meta.get("occasion", []),
+                "visual_characteristics": meta.get("visual_characteristics", []),
+                "gender_target": meta.get("gender_target"),
+                "season": meta.get("season", []),
+                "sustainability": meta.get("sustainability", []),
+                "color_family": meta.get("color_family", []),
+            })
+        return items
     
     def delete_namespace(self, namespace: str):
         """Delete all vectors in a namespace"""

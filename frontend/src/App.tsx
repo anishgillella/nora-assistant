@@ -14,11 +14,13 @@ function App() {
         currentView={currentView}
       />
       <div className="flex-1 overflow-hidden">
-        {currentView === 'chat' ? (
+        {/* Keep both components mounted to preserve state */}
+        <div className={`h-full ${currentView === 'chat' ? 'block' : 'hidden'}`}>
           <ChatInterface />
-        ) : (
+        </div>
+        <div className={`h-full ${currentView === 'explorer' ? 'block' : 'hidden'}`}>
           <DataExplorer />
-        )}
+        </div>
       </div>
     </div>
   );

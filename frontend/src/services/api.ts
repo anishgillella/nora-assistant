@@ -21,10 +21,18 @@ export interface Product {
     price: number;
     brand: string;
     category: string;
-    description: string;
+    description?: string;
     image_url?: string;
     product_url?: string;
     store_name?: string;
+    // Rich attributes
+    materials?: string[];
+    occasion?: string[];
+    visual_characteristics?: string[];
+    gender_target?: string;
+    season?: string[];
+    sustainability?: string[];
+    color_family?: string[];
     score: number;
 }
 
@@ -237,6 +245,40 @@ export const dataApi = {
     exportProductsUrl(): string {
         return `${API_BASE_URL}/data/export/products`;
     },
+};
+
+// Profile API
+export interface UserProfile {
+    visual_style: string[];
+    brand_affinity: string[];
+    dislikes: string[];
+    price_sensitivity: string;
+    context: string[];
+    colors: string[];
+}
+
+export const profileApi = {
+    async get(): Promise<UserProfile> {
+        const response = await fetch(`${API_BASE_URL}/profile`);
+        if (!response.ok) return {
+            visual_style: [], brand_affinity: [], dislikes: [],
+            price_sensitivity: 'medium', context: [], colors: []
+        };
+        return response.json();
+    },
+
+    async update(text: string): Promise<UserProfile> {
+        const response = await fetch(`${API_BASE_URL}/profile/update`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text }),
+        });
+        return response.json();
+    },
+
+    async clear() {
+        return fetch(`${API_BASE_URL}/profile`, { method: 'DELETE' });
+    }
 };
 
 // Health API

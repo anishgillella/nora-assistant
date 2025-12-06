@@ -8,6 +8,7 @@ from app.api import (
     recommendations_router,
     conversations_router,
     data_router,
+    profile_router,
 )
 
 settings = get_settings()
@@ -34,6 +35,7 @@ app.include_router(memory_router)
 app.include_router(recommendations_router)
 app.include_router(conversations_router)
 app.include_router(data_router)
+app.include_router(profile_router)
 
 
 @app.on_event("startup")

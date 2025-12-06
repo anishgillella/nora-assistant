@@ -5,6 +5,7 @@ Scrapes products from Shopify stores via their /products.json endpoint.
 Limited to testing quantities to reduce costs.
 """
 import httpx
+import asyncio
 from typing import List, Optional, Dict
 from app.models.product import ShopifyProductRaw, Product, ProductCategory
 from app.utils.config import get_settings
@@ -12,7 +13,7 @@ from bs4 import BeautifulSoup
 
 
 class ShopifyScraper:
-    """Scrape products from Shopify stores using /products.json endpoint"""
+    """Scrape products from Shopify stores using /products.json endpoint (Async)"""
     
     # Store configurations with domains and categories - Target: ~100 products
     SHOPIFY_STORES = [
@@ -38,20 +39,20 @@ class ShopifyScraper:
     
     def __init__(self):
         self.settings = get_settings()
-        self.client = httpx.Client(
+        self.client = httpx.AsyncClient(
             timeout=20.0,
             headers={
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
             }
         )
     
-    def scrape_store(
+    async def scrape_store(
         self, 
         domain: str, 
         max_products: int = None
     ) -> List[ShopifyProductRaw]:
         """
-        Scrape products from a single Shopify store
+        Scrape products from a single Shopify store (Async)
         
         Args:
             domain: Store domain (e.g., "allbirds.com")
@@ -67,7 +68,7 @@ class ShopifyScraper:
         while len(products) < max_products:
             try:
                 url = f"https://{domain}/products.json?page={page}&limit=50"
-                response = self.client.get(url)
+                response = await self.client.get(url)
                 
                 if response.status_code != 200:
                     print(f"⚠️ Got status {response.status_code} from {domain}")
@@ -106,13 +107,13 @@ class ShopifyScraper:
         
         return products
     
-    def scrape_all_stores(
+    async def scrape_all_stores(
         self, 
         max_stores: int = None,
         products_per_store: int = None
     ) -> Dict[str, List[ShopifyProductRaw]]:
         """
-        Scrape products from all configured stores
+        Scrape products from all configured stores in parallel
         
         Args:
             max_stores: Maximum number of stores to scrape
@@ -127,14 +128,45 @@ class ShopifyScraper:
         results = {}
         stores_to_scrape = self.SHOPIFY_STORES[:max_stores]
         
+        tasks = []
         for store in stores_to_scrape:
             domain = store["domain"]
             name = store["name"]
-            print(f"🛒 Scraping {name} ({domain})...")
-            
-            products = self.scrape_store(domain, products_per_store)
-            results[name] = products
-            print(f"   ✅ Got {len(products)} products from {name}")
+            tasks.append(self.scrape_store(domain, products_per_store))
+        
+        print(f"🚀 Starting parallel scrape of {len(tasks)} stores...")
+        
+        # We wrap asyncio.gather to just get results, individual scrape_store calls could print
+        # but better to print completion here if we want atomic counts.
+        # Actually scrape_store is called internally so we can't easily wrap it without changing its signature or using a wrapper.
+        # Let's use a wrapper for logging.
+        
+        total_stores = len(tasks)
+        completed_stores = 0
+        
+        async def logged_scrape(coro, store_name):
+            nonlocal completed_stores
+            try:
+                result = await coro
+                completed_stores += 1
+                count = len(result)
+                print(f"   [{completed_stores}/{total_stores}] ✅ {store_name}: Got {count} products")
+                return result
+            except Exception as e:
+                completed_stores += 1
+                print(f"   [{completed_stores}/{total_stores}] ❌ {store_name}: Failed ({e})")
+                return []
+
+        # Re-create tasks wrapped with logging
+        logged_tasks = []
+        for store in stores_to_scrape:
+             logged_tasks.append(logged_scrape(self.scrape_store(store["domain"], products_per_store), store["name"]))
+
+        scraped_lists = await asyncio.gather(*logged_tasks)
+        
+        for i, products in enumerate(scraped_lists):
+            store_name = stores_to_scrape[i]["name"]
+            results[store_name] = products
         
         return results
     
@@ -145,7 +177,7 @@ class ShopifyScraper:
         store_domain: str,
         default_category: ProductCategory
     ) -> Optional[Product]:
-        """Convert raw Shopify product to structured Product model"""
+        """Convert raw Shopify product to structured Product model (CPU bound, sync ok)"""
         try:
             # Get price from first variant
             price = 0.0
@@ -167,10 +199,17 @@ class ShopifyScraper:
             # Build product URL
             product_url = f"https://{store_domain}/products/{raw.handle}" if raw.handle else f"https://{store_domain}"
             
-            # Parse tags - already a list from Shopify
+            # Parse tags - handle both list and comma-separated string
             tags = []
             if raw.tags:
-                tags = [t.strip() for t in raw.tags if isinstance(t, str) and t.strip()]
+                if isinstance(raw.tags, str):
+                    tags = [t.strip() for t in raw.tags.split(',') if t.strip()]
+                elif isinstance(raw.tags, list):
+                    tags = [str(t).strip() for t in raw.tags if str(t).strip()]
+            
+            # Generate deterministic ID
+            # This ensures re-scraping the same product doesn't create a new Pinecone vector
+            product_id = f"shopify_{store_name.lower().replace(' ', '_')}_{raw.id}"
             
             # Get variants
             variants = []
@@ -180,6 +219,7 @@ class ShopifyScraper:
                     variants.append(title)
             
             return Product(
+                id=product_id,
                 name=raw.title,
                 price=price,
                 category=default_category,
@@ -196,10 +236,10 @@ class ShopifyScraper:
             print(f"❌ Error converting product: {e}")
             return None
     
-    def scrape_and_convert_all(self) -> List[Product]:
+    async def scrape_and_convert_all(self) -> List[Product]:
         """Scrape all stores and convert to structured Product models"""
         all_products = []
-        raw_results = self.scrape_all_stores()
+        raw_results = await self.scrape_all_stores()
         
         for store in self.SHOPIFY_STORES[:self.settings.max_shopify_stores]:
             name = store["name"]
@@ -215,6 +255,6 @@ class ShopifyScraper:
         print(f"\n📦 Total products scraped: {len(all_products)}")
         return all_products
     
-    def close(self):
+    async def close(self):
         """Close HTTP client"""
-        self.client.close()
+        await self.client.aclose()

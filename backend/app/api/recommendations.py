@@ -129,7 +129,7 @@ async def refresh_product_catalog(max_stores: int = 3, products_per_store: int =
         store = get_vector_store()
         
         # Scrape products
-        products = scraper.scrape_and_convert_all()
+        products = await scraper.scrape_and_convert_all()
         
         if not products:
             return {
@@ -158,7 +158,7 @@ async def refresh_product_catalog(max_stores: int = 3, products_per_store: int =
         # Index in Pinecone
         indexed_count = store.upsert_products(product_dicts)
         
-        scraper.close()
+        await scraper.close()
         
         return {
             "status": "success",
@@ -171,19 +171,12 @@ async def refresh_product_catalog(max_stores: int = 3, products_per_store: int =
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/categories")
-async def get_categories():
-    """Get available product categories"""
-    return {
-        "categories": [
-            "shoes",
-            "clothing", 
-            "accessories",
-            "fitness",
-            "outdoor",
-            "eyewear",
-            "home",
-            "electronics",
-            "other"
-        ]
-    }
+@router.delete("/clear")
+async def clear_product_catalog():
+    """Clear all products from the catalog."""
+    try:
+        store = get_vector_store()
+        store.delete_namespace("products")
+        return {"status": "success", "message": "Product catalog cleared"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

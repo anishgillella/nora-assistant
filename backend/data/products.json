@@ -1,72 +1,688 @@
 [
   {
-    "name": "Women's Tree Dasher 2",
-    "brand": "Allbirds",
-    "price": 94,
-    "category": "shoes",
-    "description": "Responsive foam and extra grip for active use"
+    "id": "seed_product_5_1765006200",
+    "name": "Sony WH-1000XM5",
+    "brand": "Sony",
+    "category": "electronics",
+    "price": 399.0,
+    "description": "The Sony WH-1000XM5 wireless headphones feature industry-leading noise cancellation with eight microphones and two processors. They offer 30 hours of battery life, LDAC Hi-Res Audio, Multipoint connection for two devices, and weigh just 250g. The soft-fit leather ear pads and silent rotating hinges make them perfect for travel, work, and audiophile listening.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Sony+WH-1000XM5",
+    "product_url": "https://electronics.sony.com/audio/headphones/headband/p/wh1000xm5-s",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Focus Work"
+    ],
+    "visual_characteristics": [
+      "Minimalist"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
   },
   {
-    "name": "The Royale 2.0 - Matte Black",
-    "brand": "Greats",
-    "price": 138.99,
-    "category": "shoes",
-    "description": "Classic sneaker epitome of effortless cool"
+    "id": "seed_product_10_1765006200",
+    "name": "AirPods Pro 2nd Gen",
+    "brand": "Apple",
+    "category": "electronics",
+    "price": 249.0,
+    "description": "The AirPods Pro 2nd Generation feature the H2 chip with 2x more active noise cancellation and Adaptive Transparency. They offer personalized Spatial Audio with head tracking, touch controls for volume, and up to 6 hours of listening time. The MagSafe charging case provides 30 hours total with Find My and precision finding built in.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=AirPods+Pro+2nd+Gen",
+    "product_url": "https://www.apple.com/shop/product/MQD83AM/A/airpods-pro",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Commute"
+    ],
+    "visual_characteristics": [
+      "Seamless",
+      "Premium"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
   },
   {
-    "name": "The Royale 2.0 - Crazy Horse Brown",
-    "brand": "Greats",
-    "price": 149.99,
-    "category": "shoes",
-    "description": "Premium leather sneaker"
-  },
-  {
-    "name": "LightSpeed Minimal 3\" Skort CL",
-    "brand": "Outdoor Voices",
-    "price": 19.95,
+    "id": "seed_product_14_1765006200",
+    "name": "Peloton Bike",
+    "brand": "Peloton",
     "category": "fitness",
-    "description": "Phone pocket and built-in shorts"
+    "price": 1445.0,
+    "description": "The Peloton Bike features a 22-inch HD touchscreen, near-silent belt drive, and magnetic resistance for smooth, quiet rides. Access thousands of on-demand and live classes led by world-class instructors. Track your progress with real-time metrics, compete on leaderboards, and stream content from Netflix and Spotify during workouts.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Peloton+Bike",
+    "product_url": "https://www.peloton.com/shop/bike/bike-package",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Fitness Goals"
+    ],
+    "visual_characteristics": [
+      "Motivating",
+      "Premium"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
   },
   {
-    "name": "Quilted Reynard Crew",
-    "brand": "tentree",
-    "price": 88,
-    "category": "clothing",
-    "description": "Perfect for layering with quilted design"
+    "id": "seed_product_21_1765006200",
+    "name": "Breville Barista Express",
+    "brand": "Breville",
+    "category": "electronics",
+    "price": 749.0,
+    "description": "The Breville Barista Express is an all-in-one espresso machine with integrated conical burr grinder. Features 15-bar Italian pump, PID temperature control, steam wand for microfoam milk, and dose-control grinding. The 54mm portafilter and precise extraction deliver caf\u00e9-quality espresso at home without the learning curve.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Breville+Barista+Express",
+    "product_url": "https://www.breville.com/us/en/products/espresso/bes870.html",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Coffee Enthusiast"
+    ],
+    "visual_characteristics": [
+      "Artisanal",
+      "Premium"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
   },
   {
-    "name": "Women's Corbet Quilted Crewneck",
-    "brand": "Marine Layer",
-    "price": 98,
-    "category": "clothing",
-    "description": "Cozy feel with sleek design"
-  },
-  {
-    "name": "Up and Up Pullover Hoodie",
-    "brand": "Cotopaxi",
-    "price": 42.5,
-    "category": "clothing",
-    "description": "Great for outdoor activities"
-  },
-  {
-    "name": "Chalet Knit Hoodie",
-    "brand": "Marine Layer",
-    "price": 188,
-    "category": "clothing",
-    "description": "Unique knit design that stands out"
-  },
-  {
-    "name": "The Ravine - Matte Black",
-    "brand": "Greats",
-    "price": 146.99,
+    "id": "seed_product_4_1765006200",
+    "name": "Hoka Clifton 9",
+    "brand": "Hoka",
     "category": "shoes",
-    "description": "Modern light hiker for city and outdoor"
+    "price": 145.0,
+    "description": "The Hoka Clifton 9 is a lightweight daily trainer featuring a new compression-molded EVA midsole foam for responsive cushioning. It weighs 8.9 oz with a 5mm heel-toe drop and breathable engineered mesh upper. Updated with improved durability and early-stage Meta-Rocker geometry for smooth transitions. Ideal for daily training runs and first-time marathoners.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Hoka+Clifton+9",
+    "product_url": "https://www.hoka.com/en/us/mens-road/clifton-9/1127895.html",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Marathon Training"
+    ],
+    "visual_characteristics": [
+      "Athletic"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
   },
   {
-    "name": "TreeFleece Golden Spruce Hoodie",
-    "brand": "tentree",
-    "price": 46.8,
+    "id": "seed_product_15_1765006200",
+    "name": "Sonos Arc Soundbar",
+    "brand": "Sonos",
+    "category": "electronics",
+    "price": 899.0,
+    "description": "The Sonos Arc is a premium smart soundbar with 11 high-performance drivers including Dolby Atmos upward-firing speakers for 3D sound. Features speech enhancement, night mode, and TruePlay tuning that adapts to your room. Works with Alexa, Google Assistant, and AirPlay 2 for music streaming and voice control.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Sonos+Arc+Soundbar",
+    "product_url": "https://www.sonos.com/en-us/shop/arc",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Home Theater"
+    ],
+    "visual_characteristics": [
+      "Immersive",
+      "Premium"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_24_1765006200",
+    "name": "Garmin Fenix 7X",
+    "brand": "Garmin",
+    "category": "electronics",
+    "price": 899.0,
+    "description": "The Garmin Fenix 7X is a rugged multisport GPS watch with a 1.4-inch sunlight-readable display with flashlight and solar charging extending battery to 37 days. Features include topo maps, ski resort maps, golf course maps, and advanced training metrics like VO2 max, training load, and recovery advisor for serious athletes.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Garmin+Fenix+7X",
+    "product_url": "https://www.garmin.com/en-US/p/775412",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Outdoor Sports"
+    ],
+    "visual_characteristics": [
+      "Rugged",
+      "Performance"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_6_1765006200",
+    "name": "LG C3 65\" OLED TV",
+    "brand": "LG",
+    "category": "electronics",
+    "price": 1499.0,
+    "description": "The LG C3 65-inch OLED TV features self-lit pixels delivering perfect blacks and infinite contrast. With Dolby Vision, Dolby Atmos, and 120Hz refresh rate, it's ideal for movies, gaming, and sports. The \u03b19 AI Processor Gen6 upscales content to near-4K quality. Includes 4 HDMI 2.1 ports for next-gen gaming consoles.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=LG+C3+65\"+OLED+TV",
+    "product_url": "https://www.amazon.com/dp/B0BSHF7T5S",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Living Room Upgrade"
+    ],
+    "visual_characteristics": [
+      "Cinematic",
+      "Premium"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_26_1765006200",
+    "name": "Aesop Resurrection Hand Balm",
+    "brand": "Aesop",
+    "category": "beauty",
+    "price": 29.0,
+    "description": "Aesop Resurrection Aromatique Hand Balm is a rich, intensely hydrating formula with Mandarin Rind, Rosemary Leaf, and Cedar Atlas essential oils. It absorbs quickly without greasy residue, softening rough skin and cuticles. The signature citrus-woody scent and minimal amber packaging make it a staple for hand care enthusiasts.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Aesop+Resurrection+Hand+Balm",
+    "product_url": "https://www.aesop.com/us/p/skin/hand-and-body/resurrection-aromatique-hand-balm/",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Self-Care"
+    ],
+    "visual_characteristics": [
+      "Luxurious",
+      "Botanical"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_28_1765006200",
+    "name": "Warby Parker Durand",
+    "brand": "Warby Parker",
+    "category": "accessories",
+    "price": 145.0,
+    "description": "The Warby Parker Durand is a classic round frame handcrafted from plant-based cellulose acetate. It includes premium optical lenses with anti-reflective, scratch-resistant, and UV-blocking coatings. Home Try-On lets you test 5 frames free, and every purchase includes a pair donated through the Buy a Pair, Give a Pair program.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Warby+Parker+Durand",
+    "product_url": "https://www.warbyparker.com/eyeglasses/men/durand",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Vision"
+    ],
+    "visual_characteristics": [
+      "Stylish",
+      "Affordable"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_19_1765006200",
+    "name": "Levi's 501 Original",
+    "brand": "Levi's",
     "category": "clothing",
-    "description": "Eco-friendly sustainable materials"
+    "price": 79.0,
+    "description": "The Levi's 501 Original Fit Jeans are the iconic button-fly denim that defined American style since 1873. Made from 100% cotton with the signature straight leg and relaxed seat. These jeans break in uniquely over time, developing personal fades and character. Available in 35+ washes from rigid to distressed.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Levi's+501+Original",
+    "product_url": "https://www.levistrauss.com/shop/jeans/501-original-fit-jeans",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Casual Wear"
+    ],
+    "visual_characteristics": [
+      "Classic",
+      "Timeless"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_27_1765006200",
+    "name": "Bose QuietComfort Ultra",
+    "brand": "Bose",
+    "category": "electronics",
+    "price": 429.0,
+    "description": "The Bose QuietComfort Ultra Headphones feature Immersive Audio for spatial sound experiences and CustomTune technology that optimizes noise cancellation for your ears. With up to 24 hours of battery life, luxurious protein leather cushions, and Aware mode for transparency, they're designed for premium comfort on long flights and work sessions.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Bose+QuietComfort+Ultra",
+    "product_url": "https://www.bose.com/en_us/products/headphones/noise_cancelling_headphones/quietcomfort-ultra-headphones.html",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Travel"
+    ],
+    "visual_characteristics": [
+      "Comfortable",
+      "Immersive"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_22_1765006200",
+    "name": "Nintendo Switch OLED",
+    "brand": "Nintendo",
+    "category": "electronics",
+    "price": 349.0,
+    "description": "The Nintendo Switch OLED Model features a vibrant 7-inch OLED screen with vivid colors and sharp contrast. It includes a wide adjustable kickstand, 64GB internal storage, enhanced audio, and wired LAN port in the dock. Play the same great games at home on your TV or on the go in handheld mode.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Nintendo+Switch+OLED",
+    "product_url": "https://www.nintendo.com/us/switch/oled-model/",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Entertainment"
+    ],
+    "visual_characteristics": [
+      "Fun",
+      "Portable"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_7_1765006200",
+    "name": "Allbirds Tree Runners",
+    "brand": "Allbirds",
+    "category": "shoes",
+    "price": 98.0,
+    "description": "The Allbirds Tree Runners are lightweight everyday sneakers made from FSC-certified eucalyptus tree fiber. They feature a carbon-negative sole made with sugarcane-based SweetFoam, breathable mesh upper, and removable merino wool insole. Machine washable and designed for all-day comfort with a minimal environmental footprint.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Allbirds+Tree+Runners",
+    "product_url": "https://www.allbirds.com/products/mens-tree-runners",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Everyday Wear"
+    ],
+    "visual_characteristics": [
+      "Eco-Friendly",
+      "Casual"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_25_1765006200",
+    "name": "Tesla Wall Connector",
+    "brand": "Tesla",
+    "category": "electronics",
+    "price": 475.0,
+    "description": "The Tesla Wall Connector is a home charging station delivering up to 44 miles of range per hour with 11.5kW power. It features a 24-foot cable, WiFi connectivity for over-the-air updates, and power-sharing for multiple connectors. Compatible with all Tesla vehicles and adapts to various outlet types for flexible installation.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Tesla+Wall+Connector",
+    "product_url": "https://www.tesla.com/shop/product/wall-connector",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Home EV"
+    ],
+    "visual_characteristics": [
+      "Sustainable",
+      "Modern"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_20_1765006200",
+    "name": "Oura Ring Gen 3",
+    "brand": "Oura",
+    "category": "electronics",
+    "price": 299.0,
+    "description": "The Oura Ring Gen 3 is a titanium smart ring that tracks sleep, activity, and recovery without a bulky wristband. It measures heart rate, HRV, body temperature, and blood oxygen. The app provides readiness scores, sleep insights, and personalized recommendations. 7-day battery life and waterproof to 100m depth.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Oura+Ring+Gen+3",
+    "product_url": "https://www.oura.com/product/oura-ring-gen3",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Health Tracking"
+    ],
+    "visual_characteristics": [
+      "Minimal",
+      "Wellness"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_16_1765006200",
+    "name": "Lululemon ABC Pants",
+    "brand": "Lululemon",
+    "category": "clothing",
+    "price": 138.0,
+    "description": "The Lululemon ABC (Anti-Ball Crushing) Pants feature Warpstreme fabric that's sweat-wicking, quick-drying, and four-way stretch. The ergonomic gusset provides freedom of movement while the classic fit works for office or gym. Available in 28-37 inch inseams with hidden zip pocket for commuters.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Lululemon+ABC+Pants",
+    "product_url": "https://www.lululemon.com/en-us/p/abc-pant-classic/LM5AFTS.html",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Office Casual"
+    ],
+    "visual_characteristics": [
+      "Versatile",
+      "Comfortable"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_8_1765006200",
+    "name": "Dyson V15 Detect",
+    "brand": "Dyson",
+    "category": "electronics",
+    "price": 749.0,
+    "description": "The Dyson V15 Detect cordless vacuum features a laser that reveals hidden dust on hard floors. It has an LCD screen showing real-time particle counts, automatically adjusts suction power based on debris, and offers up to 60 minutes of runtime. The HEPA filtration captures 99.99% of particles for allergy-friendly cleaning.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Dyson+V15+Detect",
+    "product_url": "https://www.dyson.com/vacuum-cleaners/cordless/v15/detect",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Home Cleaning"
+    ],
+    "visual_characteristics": [
+      "High-Tech",
+      "Premium"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_12_1765006200",
+    "name": "Brooklinen Luxe Sheet Set",
+    "brand": "Brooklinen",
+    "category": "home",
+    "price": 179.0,
+    "description": "The Brooklinen Luxe Sheet Set is made from 480 thread count long-staple cotton sateen for a silky, buttery feel. It includes a flat sheet, fitted sheet with deep pockets for thick mattresses, and two pillowcases. OEKO-TEX certified and available in 20+ colors, these sheets get softer with every wash.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Brooklinen+Luxe+Sheet+Set",
+    "product_url": "https://www.brooklinen.com/products/luxe-core-sheet-set",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Bedroom Upgrade"
+    ],
+    "visual_characteristics": [
+      "Cozy",
+      "Luxurious"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_0_1765006200",
+    "name": "MacBook Air M3",
+    "brand": "Apple",
+    "category": "electronics",
+    "price": 1099.0,
+    "description": "The MacBook Air M3 is Apple's thinnest and lightest laptop, featuring the powerful M3 chip with 8-core CPU and 10-core GPU. It offers up to 18 hours of battery life, a stunning 13.6-inch Liquid Retina display with 500 nits brightness, and weighs just 2.7 pounds. Ideal for creative professionals, students, and anyone needing portable power for video editing, coding, and design work.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=MacBook+Air+M3",
+    "product_url": "https://www.apple.com/shop/buy-mac/macbook-air",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Work Setup"
+    ],
+    "visual_characteristics": [
+      "Minimalist",
+      "Premium"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_3_1765006200",
+    "name": "Aeron Chair",
+    "brand": "Herman Miller",
+    "category": "furniture",
+    "price": 1275.0,
+    "description": "The Herman Miller Aeron Chair is an iconic ergonomic office chair with patented PostureFit SL support and 8Z Pellicle suspension material. It features adjustable arms, tilt tension, and three size options for personalized comfort. Designed for 12+ hours of daily use, it meets BIFMA sustainability standards and comes with a 12-year warranty.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Aeron+Chair",
+    "product_url": "https://www.hermanmiller.com/products/seating/office-chairs/aeron-chairs/",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Remote Work"
+    ],
+    "visual_characteristics": [
+      "Professional"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_2_1765006200",
+    "name": "Nano Puff Jacket",
+    "brand": "Patagonia",
+    "category": "clothing",
+    "price": 239.0,
+    "description": "The Patagonia Nano Puff Jacket is an award-winning insulated layer made with 60g PrimaLoft Gold Insulation Eco for warmth even when wet. It features a 100% recycled polyester ripstop shell, weighs just 10.1 oz, and packs into its own pocket. Windproof and water-resistant, it's designed for alpine climbing, backcountry skiing, and everyday cold-weather use.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Nano+Puff+Jacket",
+    "product_url": "https://www.patagonia.com/product/mens-nano-puff-jacket/84212.html",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Hiking"
+    ],
+    "visual_characteristics": [
+      "Rugged"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_11_1765006200",
+    "name": "Samsung Galaxy S24 Ultra",
+    "brand": "Samsung",
+    "category": "electronics",
+    "price": 1299.0,
+    "description": "The Samsung Galaxy S24 Ultra features a 6.8-inch QHD+ Dynamic AMOLED display with 2600 nits brightness and titanium frame. It includes a 200MP main camera, 100x Space Zoom, built-in S Pen, and Galaxy AI features for real-time translation and photo editing. The Snapdragon 8 Gen 3 chip delivers flagship performance.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Samsung+Galaxy+S24+Ultra",
+    "product_url": "https://www.samsung.com/us/smartphones/galaxy-s24-ultra/",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Upgrade"
+    ],
+    "visual_characteristics": [
+      "Cutting-Edge",
+      "Productive"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_29_1765006200",
+    "name": "Molecule 1 Mattress",
+    "brand": "Molecule",
+    "category": "home",
+    "price": 899.0,
+    "description": "The Molecule 1 Mattress uses Air-Engineered foam with microperforations for 8x better airflow than traditional memory foam. It features MolecularFlo adaptive support that responds to pressure points and recovers quickly. Developed for athletes, it's CertiPUR-US certified and comes with a 100-night trial and 5-year warranty.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Molecule+1+Mattress",
+    "product_url": "https://www.molecule.com/products/molecule-1-mattress",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Bedroom Upgrade"
+    ],
+    "visual_characteristics": [
+      "Supportive",
+      "Athletic"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_13_1765006200",
+    "name": "YETI Tundra 45 Cooler",
+    "brand": "YETI",
+    "category": "outdoor",
+    "price": 325.0,
+    "description": "The YETI Tundra 45 is a rotomolded hard cooler with PermaFrost Insulation that keeps ice for days. It features T-Rex Lid Latches, tie-down slots for securing to your truck bed, and is certified bear-resistant. Holds 26 cans with ice and is built to withstand extreme conditions for camping, fishing, and tailgating.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=YETI+Tundra+45+Cooler",
+    "product_url": "https://www.yeti.com/coolers/hard-coolers/tundra/tundra-45.html",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Camping Trip"
+    ],
+    "visual_characteristics": [
+      "Rugged",
+      "Adventure"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_23_1765006200",
+    "name": "Osprey Atmos AG 65",
+    "brand": "Osprey",
+    "category": "outdoor",
+    "price": 320.0,
+    "description": "The Osprey Atmos AG 65 is a 65-liter backpacking pack with Anti-Gravity suspension that molds to your body. Features include Fit-on-the-Fly hipbelt and harness adjustments, integrated raincover, and Stow-on-the-Go trekking pole attachments. At 4.5 lbs, it balances load-carrying comfort with lightweight design for multi-day treks.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Osprey+Atmos+AG+65",
+    "product_url": "https://www.rei.com/product/171020/osprey-atmos-ag-65-pack-mens",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Hiking Trip"
+    ],
+    "visual_characteristics": [
+      "Adventure",
+      "Durable"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_18_1765006200",
+    "name": "Away Bigger Carry-On",
+    "brand": "Away",
+    "category": "luggage",
+    "price": 295.0,
+    "description": "The Away Bigger Carry-On is a hard-shell suitcase made from durable polycarbonate with an ejectable battery for phone charging. It features 360\u00b0 spinner wheels, TSA-approved lock, interior compression system, and removable laundry bag. Sized to fit in most overhead bins with 47.9L capacity for extended trips.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Away+Bigger+Carry-On",
+    "product_url": "https://www.away.com/suitcases/the-bigger-carry-on",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Travel"
+    ],
+    "visual_characteristics": [
+      "Stylish",
+      "Practical"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_1_1765006200",
+    "name": "Air Jordan 1 High",
+    "brand": "Jordan",
+    "category": "shoes",
+    "price": 180.0,
+    "description": "The Air Jordan 1 Retro High OG is a legendary basketball sneaker originally released in 1985, featuring premium leather construction, Nike Air cushioning, and the iconic Wings logo. This colorway combines bold contrasting panels with a classic high-top silhouette. Perfect for sneaker collectors, streetwear enthusiasts, and anyone seeking a timeless style statement.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Air+Jordan+1+High",
+    "product_url": "https://www.nike.com/t/air-jordan-1-retro-high-og-mens-shoes-X5Vj9n",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Streetwear"
+    ],
+    "visual_characteristics": [
+      "Bold",
+      "Vintage"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_17_1765006200",
+    "name": "Kindle Paperwhite Signature",
+    "brand": "Amazon",
+    "category": "electronics",
+    "price": 189.0,
+    "description": "The Kindle Paperwhite Signature Edition features a 6.8-inch 300 ppi glare-free display with adjustable warm light. It's waterproof (IPX8), offers 32GB storage for thousands of books, and includes wireless charging and auto-adjusting front light. Up to 10 weeks of battery life makes it perfect for avid readers.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Kindle+Paperwhite+Signature",
+    "product_url": "https://www.amazon.com/Kindle-Paperwhite-16-GB-Signature/dp/B08N36XNTT",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Reading"
+    ],
+    "visual_characteristics": [
+      "Literary",
+      "Relaxed"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
+  },
+  {
+    "id": "seed_product_9_1765006200",
+    "name": "Arc'teryx Beta AR Jacket",
+    "brand": "Arc'teryx",
+    "category": "clothing",
+    "price": 625.0,
+    "description": "The Arc'teryx Beta AR Jacket is a versatile all-round shell using GORE-TEX Pro for maximum waterproof breathability. It features articulated patterning for mobility, helmet-compatible StormHood, and WaterTight zippers. At 16 oz, it handles everything from alpine climbing to urban commuting in wet conditions.",
+    "image_url": "https://placehold.co/400x300/e2e8f0/64748b?text=Arc'teryx+Beta+AR+Jacket",
+    "product_url": "https://www.arcteryx.com/us/en/shop/mens/beta-ar-jacket",
+    "store_name": "",
+    "materials": [],
+    "occasion": [
+      "Backcountry"
+    ],
+    "visual_characteristics": [
+      "Technical",
+      "Adventure"
+    ],
+    "gender_target": "",
+    "season": [],
+    "sustainability": [],
+    "color_family": []
   }
 ]

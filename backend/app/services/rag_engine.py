@@ -1,42 +1,28 @@
 """
 RAG (Retrieval Augmented Generation) Engine
 
-Features:
-1. Hybrid retrieval - combines current query with conversation context
-2. LLM-based query rewriting - no hardcoded keywords
-3. Structured output for product card selection
-4. Dual namespace search (browsing + products)
+Clean, LLM-first architecture:
+- Pure embeddings for retrieval (no regex patterns)
+- Single LLM call with structured output
+- Product selection by ID (no name matching)
+- All intelligence handled by LLM + embeddings
 """
-from typing import List, Dict, Optional, Tuple
-import logging
 import json
-from pydantic import BaseModel, Field
+import logging
+from typing import List, Dict, Optional, Any
 from openai import OpenAI
 from app.utils.config import get_settings
 from app.utils.token_utils import get_tracker
 from app.services.vector_store import PineconeStore
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class QueryRewrite(BaseModel):
-    """LLM-rewritten query for better retrieval"""
-    rewritten_query: str = Field(description="The expanded search query")
-    product_category: Optional[str] = Field(default=None, description="Product category if relevant (shoes, clothing, etc)")
-    intent: str = Field(description="User's intent: 'recommendation', 'memory_recall', 'comparison', 'general'")
-
-
-class ProductSelection(BaseModel):
-    """Structured output for LLM product selections"""
-    show_product_cards: bool = Field(description="Whether to display product recommendation cards")
-    selected_product_names: List[str] = Field(default_factory=list, description="Product names to display as cards")
-
-
 class RAGEngine:
     """
-    RAG Engine with hybrid retrieval and LLM query rewriting.
+    Simplified RAG Engine - lets embeddings and LLM handle all intelligence.
+    No regex patterns, no hardcoded keywords, no manual category detection.
     """
     
     def __init__(self):
@@ -49,229 +35,229 @@ class RAGEngine:
         self.vector_store = PineconeStore()
         self.tracker = get_tracker()
     
-    def rewrite_query(self, query: str, conversation_history: List[Dict] = None) -> QueryRewrite:
-        """
-        Use LLM to rewrite/expand the query based on conversation context.
-        No hardcoded keywords - LLM decides everything.
-        """
-        history_context = ""
-        if conversation_history:
-            recent = conversation_history[-4:]  # Last 2 exchanges
-            history_context = "\n".join([f"{m['role']}: {m['content'][:200]}" for m in recent])
-        
-        prompt = f"""Analyze this user query and rewrite it for optimal product search.
-
-Conversation History:
-{history_context if history_context else "No previous conversation"}
-
-Current Query: "{query}"
-
-Rewrite the query to be more specific and searchable. Consider:
-1. If the query is vague (like "more suggestions"), expand it based on conversation context
-2. Extract the product category if any (shoes, clothing, fitness, outdoor, etc)
-3. Determine the user's intent
-
-Respond with JSON:
-{{"rewritten_query": "expanded search query with specific product terms", "product_category": "category or null", "intent": "recommendation|memory_recall|comparison|general"}}"""
-
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0,
-                max_tokens=150
-            )
-            
-            content = response.choices[0].message.content.strip()
-            # Parse JSON from response
-            if "```json" in content:
-                content = content.split("```json")[1].split("```")[0].strip()
-            elif "```" in content:
-                content = content.split("```")[1].split("```")[0].strip()
-            
-            data = json.loads(content)
-            result = QueryRewrite(**data)
-            logger.info(f"🔄 Query rewritten: '{query}' → '{result.rewritten_query}' (intent: {result.intent})")
-            return result
-        except Exception as e:
-            logger.warning(f"Query rewrite failed: {e}")
-            return QueryRewrite(rewritten_query=query, intent="general")
-    
-    def retrieve_context(
+    def retrieve(
         self, 
         query: str, 
-        rewritten_query: str = None,
-        category: str = None,
-        top_k: int = 5
-    ) -> Tuple[List[Dict], List[Dict]]:
+        top_k: int = 5,
+        user_profile: Optional[object] = None
+    ) -> tuple[List[Dict], List[Dict]]:
         """
-        Hybrid retrieval using both original and rewritten queries.
+        Pure embedding-based retrieval - no filters, no category detection.
+        Embeddings naturally return semantically relevant results.
         """
-        search_query = rewritten_query or query
-        logger.info(f"🔍 Searching for: '{search_query}'")
+        # Get browsing history relevant to query
+        browsing_results = self.vector_store.search_browsing(
+            query=query, 
+            top_k=top_k
+        )
         
-        # Search browsing history
-        browsing_results = self.vector_store.search_browsing(search_query, top_k=top_k)
-        logger.info(f"📚 Found {len(browsing_results)} browsing entries")
+        # Get products relevant to query
+        product_results = self.vector_store.search_products(
+            query=query, 
+            top_k=top_k * 2  # Get more products for LLM to choose from
+        )
         
-        # Search products with potentially enhanced query
-        product_query = search_query
-        if category:
-            product_query = f"{category} {search_query}"
+        # Optional: Boost brands from user profile (soft boosting only)
+        if user_profile and hasattr(user_profile, 'brand_affinity') and user_profile.brand_affinity:
+            for p in product_results:
+                if p.get('brand', '').lower() in [b.lower() for b in user_profile.brand_affinity]:
+                    p['profile_match'] = True
         
-        product_results = self.vector_store.search_products(product_query, top_k=top_k * 2)  # Get more products
-        logger.info(f"📦 Found {len(product_results)} products")
+        logger.info(f"� Found {len(browsing_results)} browsing, {len(product_results)} products")
         
         return browsing_results, product_results
     
-    def format_context(self, browsing: List[Dict], products: List[Dict]) -> str:
-        """Format retrieved results into context string for LLM"""
-        context_parts = []
+    def format_context(
+        self, 
+        browsing: List[Dict], 
+        products: List[Dict], 
+        user_profile: Optional[object] = None
+    ) -> str:
+        """Format retrieved data as context for LLM"""
+        parts = []
         
+        # User profile context
+        if user_profile:
+            profile_parts = []
+            if hasattr(user_profile, 'visual_style') and user_profile.visual_style:
+                profile_parts.append(f"Style preferences: {', '.join(user_profile.visual_style)}")
+            if hasattr(user_profile, 'brand_affinity') and user_profile.brand_affinity:
+                profile_parts.append(f"Favorite brands: {', '.join(user_profile.brand_affinity)}")
+            if hasattr(user_profile, 'dislikes') and user_profile.dislikes:
+                profile_parts.append(f"Dislikes (avoid these): {', '.join(user_profile.dislikes)}")
+            if profile_parts:
+                parts.append("## User Profile\n" + "\n".join(profile_parts))
+        
+        # Browsing history
         if browsing:
-            context_parts.append("## User's Browsing History:")
-            for i, b in enumerate(browsing, 1):
-                name = b.get('product_name') or b.get('title', 'Unknown')
-                price = b.get('product_price', 0)
-                brand = b.get('product_brand', '')
-                line = f"{i}. {name}"
-                if brand:
-                    line += f" by {brand}"
-                if price:
-                    line += f" - ${price}"
-                context_parts.append(line)
+            parts.append("## Recent Browsing History")
+            for b in browsing[:5]:
+                title = b.get('title', 'Unknown')
+                summary = b.get('semantic_summary', '')[:200]
+                parts.append(f"- {title}: {summary}")
         
+        # Available products with IDs
         if products:
-            context_parts.append("\n## Available Products from Catalog:")
-            for i, p in enumerate(products, 1):
+            parts.append("\n## Available Products (use these IDs in your response)")
+            for p in products:
+                pid = p.get('id', '')
                 name = p.get('name', 'Unknown')
-                brand = p.get('brand', 'Unknown')
+                brand = p.get('brand', '')
                 price = p.get('price', 0)
-                category = p.get('category', '')
-                context_parts.append(f"{i}. {name} by {brand} - ${price} ({category})")
+                desc = p.get('description', '')[:150]
+                match = " ⭐ PROFILE MATCH" if p.get('profile_match') else ""
+                parts.append(f"- ID: {pid}\n  {name} by {brand} - ${price}{match}\n  {desc}")
         
-        return "\n".join(context_parts) if context_parts else "No relevant data found."
+        return "\n".join(parts)
     
-    def generate_response_with_products(
+    def generate_response(
         self,
         query: str,
         context: str,
         products: List[Dict],
-        intent: str,
         conversation_history: List[Dict] = None
-    ) -> Tuple[str, List[Dict]]:
-        """Generate response with LLM-selected products."""
+    ) -> tuple[str, List[Dict]]:
+        """
+        Single LLM call that handles everything:
+        - Understands user intent from query
+        - Uses browsing context for personalization
+        - Selects products by ID
+        - Provides specific reasons for each
+        """
         
-        system_prompt = """You are Nora, a shopping assistant with access to user's browsing history and a product catalog.
+        # Build product ID list for the prompt
+        product_ids = [p.get('id', '') for p in products]
+        
+        system_prompt = """You are Nora, a personalized shopping assistant. You have access to the user's browsing history and available products.
 
-Guidelines:
-- Use the provided context to answer questions
-- For recommendations, explain WHY based on browsing history
-- Include prices when discussing products
-- Be conversational and helpful
+Your response MUST be valid JSON in this exact format:
+{
+  "response": "Your helpful, conversational response",
+  "selected_products": [
+    {
+      "id": "exact product ID from the list",
+      "reason": "1-2 sentences explaining WHY this product fits the user based on their browsing history, preferences, or question"
+    }
+  ]
+}
 
-After your response, indicate which products to show as cards (if any)."""
+RULES:
+1. Use ONLY product IDs from the Available Products list
+2. Select 2-4 products that are ACTUALLY relevant to the user's question
+3. Write personalized reasons based on their browsing history and profile
+4. If no products match the user's request, return an empty selected_products array
+5. Be conversational and helpful in your response"""
 
         messages = [{"role": "system", "content": system_prompt}]
         
+        # Add conversation history for context
         if conversation_history:
-            messages.extend(conversation_history[-6:])
-        
-        product_names = [p.get('name', '') for p in products]
+            messages.extend(conversation_history[-4:])
         
         user_message = f"""Context:
 {context}
 
+Available product IDs: {product_ids}
+
 User's question: {query}
-Intent: {intent}
 
----
-After your response, provide JSON:
-{{"show_product_cards": true/false, "selected_product_names": ["exact name 1", "exact name 2"]}}
-
-Available products: {product_names[:10]}"""
+Respond with JSON containing your response and selected product IDs with reasons."""
         
         messages.append({"role": "user", "content": user_message})
         
-        logger.info(f"🤖 Calling LLM ({self.model})...")
+        logger.info(f"🤖 Calling LLM...")
+        
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
             temperature=0.7,
-            max_tokens=600
+            max_tokens=800,
+            response_format={"type": "json_object"}
         )
         self.tracker.add_from_response(response)
         
-        full_response = response.choices[0].message.content
-        logger.info(f"✅ LLM response received ({len(full_response)} chars)")
-        
-        # Parse structured output - handle multiple JSON formats
+        # Parse JSON response
+        text_response = "I can help you find products!"
         selected_products = []
-        clean_response = full_response
         
         try:
-            json_str = None
+            result = json.loads(response.choices[0].message.content)
+            text_response = result.get("response", text_response)
             
-            # Try markdown code block first
-            if "```json" in full_response:
-                json_start = full_response.find("```json") + 7
-                json_end = full_response.find("```", json_start)
-                json_str = full_response[json_start:json_end].strip()
-                clean_response = full_response[:full_response.find("```json")].strip()
-            # Try raw JSON at end of response (with or without newline)
-            elif '{"show_product_cards"' in full_response:
-                json_start = full_response.find('{"show_product_cards"')
-                json_str = full_response[json_start:].strip()
-                clean_response = full_response[:json_start].strip()
+            # Match selected IDs to actual products
+            selected_items = result.get("selected_products", [])
+            logger.info(f"📋 LLM selected {len(selected_items)} products")
             
-            # Parse the JSON if found
-            if json_str:
-                selection = json.loads(json_str)
+            # Create lookup by ID
+            product_by_id = {p.get('id', ''): p for p in products}
+            
+            for item in selected_items[:4]:
+                pid = item.get("id", "")
+                reason = item.get("reason", "Recommended for you")
                 
-                if selection.get("show_product_cards", False):
-                    selected_names = selection.get("selected_product_names", [])
-                    for name in selected_names[:4]:
-                        for p in products:
-                            if p.get('name', '').lower() == name.lower():
-                                selected_products.append(p)
-                                break
-                    logger.info(f"📦 Selected {len(selected_products)} products for display")
+                if pid in product_by_id:
+                    product = product_by_id[pid]
+                    selected_products.append({
+                        **product,
+                        "reason_text": reason,
+                        "reason_codes": ["personalized"]
+                    })
+                    
+            logger.info(f"📦 Matched {len(selected_products)} products by ID")
+            
         except Exception as e:
-            logger.warning(f"Could not parse product selection: {e}")
+            logger.warning(f"JSON parse error: {e}")
+            text_response = response.choices[0].message.content
         
-        return clean_response, selected_products
+        # Fallback if no products selected
+        if not selected_products and products:
+            logger.info("⚠️ Fallback: showing top products")
+            for p in products[:4]:
+                selected_products.append({
+                    **p,
+                    "reason_text": "Top match for your query",
+                    "reason_codes": ["relevance"]
+                })
+        
+        return text_response, selected_products
     
-    def chat(self, query: str, conversation_history: List[Dict] = None) -> Dict:
-        """Main chat method with hybrid retrieval."""
+    def chat(
+        self, 
+        query: str, 
+        conversation_history: List[Dict] = None, 
+        user_profile: Optional[object] = None
+    ) -> Dict:
+        """
+        Complete RAG pipeline in 3 steps:
+        1. Retrieve - Embedding search for browsing + products
+        2. Format - Build context string
+        3. Generate - Single LLM call for response + selection
+        """
+        logger.info(f"💬 Query: '{query}'")
         
-        # 1. Rewrite query using LLM (no hardcoded keywords)
-        rewrite = self.rewrite_query(query, conversation_history)
-        
-        # 2. Hybrid retrieval with rewritten query
-        browsing, products = self.retrieve_context(
+        # 1. Retrieve relevant context
+        browsing, products = self.retrieve(
             query=query,
-            rewritten_query=rewrite.rewritten_query,
-            category=rewrite.product_category
+            user_profile=user_profile
         )
         
-        # 3. Format context
-        context = self.format_context(browsing, products)
+        # 2. Format context for LLM
+        context = self.format_context(browsing, products, user_profile)
         
-        # 4. Generate response with product selection
-        response, selected_products = self.generate_response_with_products(
+        # 3. Generate response with product selection
+        response_text, selected_products = self.generate_response(
             query=query,
             context=context,
             products=products,
-            intent=rewrite.intent,
             conversation_history=conversation_history
         )
         
         return {
-            "response": response,
-            "query_type": rewrite.intent,
+            "response": response_text,
+            "products": selected_products,
             "sources": {
-                "browsing": browsing[:5],
-                "products": selected_products
+                "browsing": len(browsing),
+                "products": len(products)
             }
         }
     

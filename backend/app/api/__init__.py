@@ -4,6 +4,7 @@ from .memory import router as memory_router
 from .recommendations import router as recommendations_router
 from .conversations import router as conversations_router
 from .data import router as data_router
+from .profile import router as profile_router
 
 __all__ = [
     "chat_router",
@@ -11,4 +12,5 @@ __all__ = [
     "recommendations_router",
     "conversations_router",
     "data_router",
+    "profile_router",
 ]

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import type { Product } from '../types';
 import { dataApi, type DataResponse } from '../services/api';
-import { Search, ExternalLink } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 export function DataExplorer() {
     const [activeTab, setActiveTab] = useState<'history' | 'products'>('history');
@@ -11,19 +10,19 @@ export function DataExplorer() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadData();
-    }, [activeTab]);
+        loadAllData();
+    }, []);
 
-    const loadData = async () => {
+    const loadAllData = async () => {
         setLoading(true);
         try {
-            if (activeTab === 'history') {
-                const data = await dataApi.getBrowsing(100, 0);
-                setBrowsingData(data);
-            } else {
-                const data = await dataApi.getProducts(100, 0);
-                setProductsData(data);
-            }
+            // Load both datasets on mount for accurate tab counts
+            const [browsing, products] = await Promise.all([
+                dataApi.getBrowsing(500, 0),
+                dataApi.getProducts(500, 0)
+            ]);
+            setBrowsingData(browsing);
+            setProductsData(products);
         } catch (error) {
             console.error('Failed to load data:', error);
         } finally {
@@ -35,16 +34,34 @@ export function DataExplorer() {
     const products = productsData?.data || [];
 
     const filteredHistory = browsingItems.filter((item: any) => {
-        const title = item.title || item.product?.name || '';
+        const title = item.title || '';
         const url = item.url || '';
-        return title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            url.toLowerCase().includes(searchQuery.toLowerCase());
+        const pName = item.product?.name || '';
+        const pBrand = item.product?.brand || '';
+        const pDesc = item.product?.description || '';
+
+        const q = searchQuery.toLowerCase();
+
+        return title.toLowerCase().includes(q) ||
+            url.toLowerCase().includes(q) ||
+            pName.toLowerCase().includes(q) ||
+            pBrand.toLowerCase().includes(q) ||
+            pDesc.toLowerCase().includes(q);
     });
 
-    const filteredProducts = products.filter((product: any) =>
-        (product.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (product.category || '').toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredProducts = products.filter((product: any) => {
+        const name = product.name || '';
+        const brand = product.brand || '';
+        const category = product.category || '';
+        const desc = product.description || '';
+
+        const q = searchQuery.toLowerCase();
+
+        return name.toLowerCase().includes(q) ||
+            brand.toLowerCase().includes(q) ||
+            category.toLowerCase().includes(q) ||
+            desc.toLowerCase().includes(q);
+    });
 
     return (
         <div className="flex flex-col h-full bg-gray-50">
@@ -56,19 +73,19 @@ export function DataExplorer() {
                 <div className="flex gap-2 mb-4">
                     <button
                         onClick={() => setActiveTab('history')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'history'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                        className={`px - 4 py - 2 rounded - lg text - sm font - medium transition - colors ${activeTab === 'history'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            } `}
                     >
                         Browsing History ({browsingData?.count || 0})
                     </button>
                     <button
                         onClick={() => setActiveTab('products')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'products'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                        className={`px - 4 py - 2 rounded - lg text - sm font - medium transition - colors ${activeTab === 'products'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            } `}
                     >
                         Product Catalog ({productsData?.count || 0})
                     </button>
@@ -93,103 +110,150 @@ export function DataExplorer() {
                     <div className="flex items-center justify-center h-40 text-gray-500">
                         Loading...
                     </div>
-                ) : activeTab === 'history' ? (
-                    <div className="space-y-3">
-                        {filteredHistory.length === 0 ? (
-                            <p className="text-gray-500 text-center py-8">No browsing history found</p>
-                        ) : (
-                            filteredHistory.map((item: any, idx: number) => (
-                                <div
-                                    key={item.id || idx}
-                                    className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-sm transition-shadow"
-                                >
-                                    <div className="flex items-start justify-between gap-3">
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-medium text-gray-900 truncate mb-1">
-                                                {item.product?.name || item.title || 'Unknown'}
-                                            </h3>
-                                            {item.product?.brand && (
-                                                <p className="text-sm text-gray-600 mb-1">{item.product.brand}</p>
-                                            )}
-                                            <p className="text-sm text-gray-500 truncate mb-2">{item.url}</p>
-                                            <div className="flex items-center gap-4 text-xs text-gray-500">
-                                                {item.product?.price && (
-                                                    <span className="font-semibold text-gray-900">
-                                                        ${item.product.price}
-                                                    </span>
-                                                )}
-                                                {item.product?.category && (
-                                                    <span className="bg-gray-100 px-2 py-0.5 rounded">
-                                                        {item.product.category}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        {item.url && (
-                                            <a
-                                                href={item.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex-shrink-0 text-blue-600 hover:text-blue-700"
-                                            >
-                                                <ExternalLink className="w-4 h-4" />
-                                            </a>
-                                        )}
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredProducts.length === 0 ? (
-                            <p className="text-gray-500 text-center py-8 col-span-full">No products found</p>
-                        ) : (
-                            filteredProducts.map((product: any, idx: number) => (
-                                <div
-                                    key={product.id || idx}
-                                    className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-sm transition-shadow"
-                                >
-                                    <div className="aspect-video overflow-hidden bg-gray-100">
-                                        {product.image_url ? (
-                                            <img
-                                                src={product.image_url}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-2xl">
-                                                📦
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="p-4">
-                                        <div className="flex items-start justify-between gap-2 mb-2">
-                                            <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">
-                                                {product.name}
-                                            </h3>
-                                            <span className="text-lg font-bold text-gray-900 whitespace-nowrap">
-                                                ${product.price}
-                                            </span>
-                                        </div>
-                                        {product.brand && (
-                                            <p className="text-xs text-gray-500 mb-1">{product.brand}</p>
-                                        )}
-                                        {product.category && (
-                                            <span className="inline-block text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded mb-2">
-                                                {product.category}
-                                            </span>
-                                        )}
-                                        {product.description && (
-                                            <p className="text-sm text-gray-600 line-clamp-2">
-                                                {product.description}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            ))
-                        )}
+                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title / URL</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Context</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vibe</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visit Date</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {activeTab === 'history' ? (
+                                    filteredHistory.length === 0 ? (
+                                        <tr><td colSpan={9} className="px-4 py-4 text-center text-gray-500">No browsing history found</td></tr>
+                                    ) : (
+                                        filteredHistory.map((item: any, idx: number) => {
+                                            // Determine activity type and icon
+                                            const activityType = item.activity_type || (item.product ? 'product' : 'content');
+                                            const typeIcons: Record<string, string> = {
+                                                'product': '🛒',
+                                                'content': '📺',
+                                                'social': '💼',
+                                                'search': '🔍',
+                                                'utility': '⚙️'
+                                            };
+                                            const typeIcon = typeIcons[activityType] || '📄';
+
+                                            // Get unified fields (support both new and legacy format)
+                                            const category = item.category || item.product?.category || '';
+                                            const topics = item.topics?.join(', ') || '';
+                                            const context = item.context?.join(', ') || item.product?.occasion?.join(', ') || '';
+                                            const vibe = item.vibe?.join(', ') || item.product?.visual_characteristics?.join(', ') || '';
+                                            const brand = item.brand || item.product?.brand || item.domain || '';
+                                            const price = item.price || item.product?.price;
+                                            const title = item.title || item.product?.name || 'Unknown';
+
+                                            return (
+                                                <tr key={item.id || idx} className="hover:bg-gray-50">
+                                                    <td className="px-4 py-4 whitespace-nowrap text-center">
+                                                        <span className="text-lg" title={activityType}>{typeIcon}</span>
+                                                    </td>
+                                                    <td className="px-4 py-4 text-sm text-gray-900 max-w-[180px]">
+                                                        <div className="font-medium truncate">{title}</div>
+                                                        <a href={item.url} target="_blank" className="text-xs text-blue-500 hover:underline truncate block" rel="noreferrer">{item.domain || item.url}</a>
+                                                    </td>
+                                                    <td className="px-4 py-4 text-xs text-gray-600 max-w-[280px]">
+                                                        <div
+                                                            className="cursor-pointer hover:text-gray-900 group"
+                                                            onClick={(e) => {
+                                                                const div = e.currentTarget;
+                                                                div.classList.toggle('line-clamp-2');
+                                                            }}
+                                                            title="Click to expand/collapse"
+                                                        >
+                                                            <span className="line-clamp-2 group-hover:line-clamp-none">
+                                                                {item.semantic_summary || item.product?.description || '-'}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {brand || '-'}
+                                                    </td>
+                                                    <td className="px-4 py-4 text-sm text-gray-500">
+                                                        {category && <span className="bg-gray-100 px-2 py-0.5 rounded text-xs">{category}</span>}
+                                                    </td>
+                                                    <td className="px-4 py-4 text-xs text-gray-500 max-w-[120px] truncate">
+                                                        {context || '-'}
+                                                    </td>
+                                                    <td className="px-4 py-4 text-xs text-gray-500 max-w-[120px] truncate">
+                                                        {vibe || '-'}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                                                        {price ? `$${price}` : '-'}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-xs text-gray-400">
+                                                        {item.visit_time ? new Date(item.visit_time).toLocaleDateString() : '-'}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )
+                                ) : (
+                                    filteredProducts.length === 0 ? (
+                                        <tr><td colSpan={9} className="px-6 py-4 text-center text-gray-500">No products found</td></tr>
+                                    ) : (
+                                        filteredProducts.map((product: any, idx: number) => (
+                                            <tr key={product.id || idx} className="hover:bg-gray-50">
+                                                <td className="px-4 py-4 whitespace-nowrap">
+                                                    <div className="h-10 w-10 rounded bg-gray-100 overflow-hidden">
+                                                        {product.image_url ? (
+                                                            <img src={product.image_url} alt="" className="h-full w-full object-cover" />
+                                                        ) : (
+                                                            <div className="h-full w-full flex items-center justify-center text-lg">📦</div>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-900 max-w-[180px]">
+                                                    <div className="font-medium truncate">{product.name}</div>
+                                                    <a href={product.product_url} target="_blank" className="text-xs text-blue-500 hover:underline truncate block" rel="noreferrer">{product.store_name || 'View'}</a>
+                                                </td>
+                                                <td className="px-4 py-4 text-xs text-gray-600 max-w-[280px]">
+                                                    <div
+                                                        className="cursor-pointer hover:text-gray-900 group"
+                                                        onClick={(e) => {
+                                                            const div = e.currentTarget;
+                                                            div.classList.toggle('line-clamp-2');
+                                                        }}
+                                                        title="Click to expand/collapse"
+                                                    >
+                                                        <span className="line-clamp-2 group-hover:line-clamp-none">
+                                                            {product.description || '-'}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {product.brand || '-'}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-500">
+                                                    {product.category && <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs">{product.category}</span>}
+                                                </td>
+                                                <td className="px-4 py-4 text-xs text-gray-500 max-w-[120px] truncate">
+                                                    {product.occasion?.join(', ') || '-'}
+                                                </td>
+                                                <td className="px-4 py-4 text-xs text-gray-500 max-w-[120px] truncate">
+                                                    {product.visual_characteristics?.join(', ') || '-'}
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
+                                                    {product.price ? `$${product.price}` : '-'}
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap text-xs text-gray-400">
+                                                    {product.created_at ? new Date(product.created_at).toLocaleDateString() : 'Synced'}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import type { Message, Product } from '../types';
+import type { Message } from '../types';
 import { ProductCard } from './ProductCard';
 import { chatApi, type ChatMessage } from '../services/api';
 import { Send, Sparkles, Bot, User } from 'lucide-react';
@@ -17,7 +17,6 @@ export function ChatInterface() {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [streamingContent, setStreamingContent] = useState('');
-    const [streamingProducts, setStreamingProducts] = useState<Product[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -42,7 +41,6 @@ export function ChatInterface() {
         setInput('');
         setIsLoading(true);
         setStreamingContent('');
-        setStreamingProducts([]);
 
         // Convert to API format
         const history: ChatMessage[] = messages.map((m) => ({
@@ -69,7 +67,6 @@ export function ChatInterface() {
                     };
                     setMessages((prev) => [...prev, aiMessage]);
                     setStreamingContent('');
-                    setStreamingProducts([]);
                     setIsLoading(false);
                 } else if (data.type === 'error') {
                     console.error('Stream error:', data.message);
@@ -121,8 +118,8 @@ export function ChatInterface() {
                         <div className={`flex-1 ${message.role === 'user' ? 'flex justify-end' : ''}`}>
                             <div
                                 className={`inline-block max-w-[85%] rounded-2xl px-4 py-3 shadow-sm ${message.role === 'user'
-                                        ? 'bg-blue-600 text-white rounded-tr-sm'
-                                        : 'bg-white text-gray-800 rounded-tl-sm border border-gray-100'
+                                    ? 'bg-blue-600 text-white rounded-tr-sm'
+                                    : 'bg-white text-gray-800 rounded-tl-sm border border-gray-100'
                                     }`}
                             >
                                 <div className="text-sm leading-relaxed">
