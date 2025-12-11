@@ -14,7 +14,10 @@ from app.services.vector_store import PineconeStore
 
 router = APIRouter(prefix="/api/data", tags=["data"])
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
+# Point to backend/data_ingestion/data
+# __file__ is backend/app/api/data.py -> ... -> backend
+BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_DIR = os.path.join(BACKEND_DIR, "data_ingestion", "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
 

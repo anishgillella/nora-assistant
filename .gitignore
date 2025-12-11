@@ -38,6 +38,9 @@ npm-debug.log*
 
 # Data files (may contain user data)
 backend/data/*.json
+backend/data_ingestion/data/*.json
+backend/data_ingestion/scrape/
+scrape/
 
 # Test files
 *.pyc

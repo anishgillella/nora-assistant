@@ -18,7 +18,7 @@ class ProductInfo(BaseModel):
     name: str
     price: Optional[float] = None
     currency: str = "USD"
-    category: Optional[str] = None
+    category: List[str] = Field(default_factory=list, description="Product categories e.g. shoes, clothing, fitness")
     brand: Optional[str] = None
     image_url: Optional[str] = None
     description: Optional[str] = None

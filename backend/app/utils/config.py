@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./nora.db"
     
     # Server
-    backend_port: int = 8000
+    backend_port: int = 8001
     frontend_url: str = "http://localhost:5173"
     
     # Models

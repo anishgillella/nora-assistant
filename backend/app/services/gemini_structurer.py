@@ -40,8 +40,7 @@ class GeminiStructurer:
         Returns:
             ProductInfo if extraction successful, None otherwise
         """
-        # Limit content to reduce tokens/cost
-        content_trimmed = content[:1500] if content else ""
+        # Use full content - Gemini 2.5 Flash has large context window
         
         prompt = f"""Extract product information from this e-commerce page.
 Return ONLY valid JSON matching this exact schema (no markdown, no explanation):
@@ -49,7 +48,7 @@ Return ONLY valid JSON matching this exact schema (no markdown, no explanation):
   "name": "product name",
   "price": 99.99,
   "currency": "USD",
-  "category": "shoes|clothing|accessories|fitness|outdoor|eyewear|home|electronics|other",
+  "category": ["primary category", "secondary category"],
   "brand": "brand name or null",
   "image_url": "url or null",
   "description": "detailed description focusing on materials, style, usage, and key features (optimized for search)",
@@ -63,13 +62,16 @@ Return ONLY valid JSON matching this exact schema (no markdown, no explanation):
   "color_family": ["Earth Tones", "Pastels", "Neon", "Monochrome"]
 }}
 
+Note: category can be MULTIPLE values if the product fits multiple categories.
+Example categories: shoes, clothing, accessories, fitness, outdoor, eyewear, home, electronics, tech, sports, wellness, travel, etc.
+
 If this is not a product page, return: {{"name": null}}
 
 URL: {url}
 Title: {title}
 
 Content:
-{content_trimmed}
+{content}
 
 JSON:"""
 
@@ -214,26 +216,28 @@ Summary:"""
         """
         from app.models.browsing import ActivityType
         
-        content_trimmed = content[:1500] if content else ""
+        # Use full content - Gemini 2.5 Flash has large context window
         
         prompt = f"""Analyze this webpage and extract behavioral signals for a recommendation system.
 Return ONLY valid JSON matching this schema (no markdown):
 {{
-  "activity_type": "product|content|social|search|utility",
-  "category": "main category (e.g. Shoes, Running, Jobs, Travel, Finance)",
-  "topics": ["topic1", "topic2"],
+  "activity_type": ["product", "content", "social", "search", "utility"],
+  "category": ["primary category", "secondary category if applicable"],
+  "topics": ["topic1", "topic2", "topic3"],
   "context": ["life signals like Job Hunting, Moving, Vacation Planning, Upskilling"],
   "vibe": ["mood/aesthetic: Professional, Adventurous, Minimalist, Aspirational"],
   "inferred_needs": ["product categories user might need based on this activity"],
   "semantic_summary": "A detailed 2-3 sentence description of the product, content, or webpage. Focus on what the item IS - its key features, benefits, specifications, and value proposition. Do NOT analyze the user or their intentions. For products: describe what it is, materials, key features, and ideal use cases. For content: describe what the video/article covers and key takeaways.",
   "price": null,
   "brand": "brand name if product page, or content creator/company name",
-  "materials": null,
-  "occasion": null,
-  "visual_characteristics": null
+  "materials": ["material1", "material2"],
+  "occasion": ["occasion1", "occasion2"],
+  "visual_characteristics": ["char1", "char2"]
 }}
 
-Activity Type Guide:
+IMPORTANT: All list fields can have MULTIPLE values if applicable.
+
+Activity Type Guide (can be multiple):
 - product: E-commerce product pages (Amazon, Nike, Shopify stores)
 - content: Videos, articles, blogs (YouTube, Medium, News)
 - social: Professional/social networks (LinkedIn, Twitter)
@@ -247,7 +251,7 @@ URL: {url}
 Title: {title}
 
 Content:
-{content_trimmed}
+{content}
 
 JSON:"""
 

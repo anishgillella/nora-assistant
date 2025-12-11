@@ -11,6 +11,30 @@ from app.services.embeddings import VoyageEmbeddings
 import uuid
 
 
+def sanitize_metadata(metadata: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Sanitize metadata for Pinecone.
+    - Removes None values
+    - Converts lists to comma-separated strings
+    - Ensures all values are str, int, float, or bool
+    """
+    clean = {}
+    for key, value in metadata.items():
+        if value is None:
+            continue  # Skip None values
+        elif isinstance(value, list):
+            # Convert list to comma-separated string
+            if all(isinstance(v, str) for v in value):
+                clean[key] = ",".join(value) if value else ""
+            else:
+                clean[key] = str(value)
+        elif isinstance(value, (str, int, float, bool)):
+            clean[key] = value
+        else:
+            clean[key] = str(value)
+    return clean
+
+
 class PineconeStore:
     """Manage vector storage in Pinecone"""
     
@@ -176,25 +200,28 @@ class PineconeStore:
         vectors = []
         for i, p in enumerate(products):
             vector_id = p.get('id') or str(uuid.uuid4())
+            
+            # Build raw metadata
+            raw_metadata = {
+                "name": p.get("name", ""),
+                "price": p.get("price") or 0,
+                "currency": p.get("currency", "USD"),
+                "category": p.get("category", []),
+                "brand": p.get("brand", ""),
+                "description": (p.get("description") or "")[:500],
+                "image_url": p.get("image_url", ""),
+                "product_url": p.get("product_url", ""),
+                "store_name": p.get("store_name", ""),
+                "materials": p.get("materials", []),
+                "occasion": p.get("occasion", []),
+                "visual_characteristics": p.get("visual_characteristics", []),
+                "gender_target": p.get("gender_target", ""),
+            }
+            
             vectors.append({
                 "id": vector_id,
                 "values": embeddings[i],
-                "metadata": {
-                    "name": p.get("name", ""),
-                    "price": p.get("price", 0),
-                    "currency": p.get("currency", "USD"),
-                    "category": str(p.get("category", "")),
-                    "brand": p.get("brand", ""),
-                    "description": p.get("description", "")[:500],
-                    "image_url": p.get("image_url", ""),
-                    "product_url": p.get("product_url", ""),
-                    "store_name": p.get("store_name", ""),
-                    # Store rich attributes in metadata for potential future filtering
-                    "materials": p.get("materials", []),
-                    "occasion": p.get("occasion", []),
-                    "visual_characteristics": p.get("visual_characteristics", []),
-                    "gender_target": p.get("gender_target") or "",
-                }
+                "metadata": sanitize_metadata(raw_metadata)
             })
         
         # Upsert in batches

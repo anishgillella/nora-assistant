@@ -34,6 +34,64 @@ class RAGEngine:
         self.model = settings.chat_model
         self.vector_store = PineconeStore()
         self.tracker = get_tracker()
+        self.classification_model = "google/gemini-2.0-flash-lite-001"  # Fast, cheap for classification
+    
+    def classify_intent(self, query: str) -> Dict[str, Any]:
+        """
+        Use LLM to classify user intent into one of:
+        - meta_browsing: User asking about their browsing history ("what have I looked at")
+        - product_search: User searching for specific products ("Nike running shoes")
+        - recommendation: User wants recommendations ("suggest something for me")
+        - general: General shopping questions
+        
+        Returns: {"intent": str, "search_query": str, "reasoning": str}
+        """
+        system_prompt = """You are an intent classifier for a shopping assistant. Classify the user's query.
+
+Return JSON with:
+{
+  "intent": "meta_browsing" | "product_search" | "recommendation" | "general",
+  "search_query": "optimized query for vector search (if applicable)",
+  "reasoning": "1 sentence explaining classification"
+}
+
+INTENT DEFINITIONS:
+- meta_browsing: User asks about THEIR browsing history, what THEY looked at, THEIR past activity
+  Examples: "what have I been looking at", "my browsing history", "what products have I viewed"
+  
+- product_search: User searches for specific products, categories, or brands
+  Examples: "Nike running shoes", "wireless headphones under $200", "show me jackets"
+  
+- recommendation: User wants personalized suggestions based on their preferences
+  Examples: "recommend something for me", "what should I buy", "find alternatives"
+  
+- general: General questions, greetings, or unclear intent
+  Examples: "hello", "how does this work", "thanks"
+
+For meta_browsing, set search_query to: "products shopping items electronics clothing footwear"
+For product_search, extract the key product terms for search_query.
+For recommendation, set search_query to the user's interests/context."""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.classification_model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Classify: {query}"}
+                ],
+                temperature=0,
+                max_tokens=150,
+                response_format={"type": "json_object"}
+            )
+            self.tracker.add_from_response(response)
+            
+            result = json.loads(response.choices[0].message.content)
+            logger.info(f"🎯 Intent: {result.get('intent')} | Reason: {result.get('reasoning', '')[:50]}")
+            return result
+            
+        except Exception as e:
+            logger.warning(f"Classification failed: {e}, falling back to product_search")
+            return {"intent": "product_search", "search_query": query, "reasoning": "fallback"}
     
     def retrieve(
         self, 
@@ -42,28 +100,77 @@ class RAGEngine:
         user_profile: Optional[object] = None
     ) -> tuple[List[Dict], List[Dict]]:
         """
-        Pure embedding-based retrieval - no filters, no category detection.
-        Embeddings naturally return semantically relevant results.
+        LLM-based intent classification with routing to appropriate retrieval strategy.
         """
-        # Get browsing history relevant to query
-        browsing_results = self.vector_store.search_browsing(
-            query=query, 
-            top_k=top_k
-        )
+        # Step 1: Classify intent with LLM
+        classification = self.classify_intent(query)
+        intent = classification.get("intent", "product_search")
+        search_query = classification.get("search_query", query)
         
-        # Get products relevant to query
-        product_results = self.vector_store.search_products(
-            query=query, 
-            top_k=top_k * 2  # Get more products for LLM to choose from
-        )
+        browsing_results = []
+        product_results = []
         
-        # Optional: Boost brands from user profile (soft boosting only)
+        # Step 2: Route based on intent
+        if intent == "meta_browsing":
+            # Fetch browsing history with product-focused query
+            logger.info(f"🔄 Meta-browsing: searching with '{search_query}'")
+            browsing_results = self.vector_store.search_browsing(
+                query=search_query,
+                top_k=top_k * 3  # Get more for filtering
+            )
+            # Filter to product-type activities only
+            browsing_results = [
+                b for b in browsing_results 
+                if 'product' in str(b.get('activity_type', [])).lower()
+            ][:top_k * 2]
+            logger.info(f"🔍 Filtered to {len(browsing_results)} product pages")
+            
+            # Also get products that match their browsing patterns
+            product_results = self.vector_store.search_products(
+                query=search_query,
+                top_k=top_k
+            )
+            
+        elif intent == "recommendation":
+            # Get both browsing context and products
+            browsing_results = self.vector_store.search_browsing(
+                query=search_query,
+                top_k=top_k
+            )
+            product_results = self.vector_store.search_products(
+                query=search_query,
+                top_k=top_k * 2
+            )
+            
+        elif intent == "product_search":
+            # Direct product search with optimized query
+            browsing_results = self.vector_store.search_browsing(
+                query=search_query,
+                top_k=top_k
+            )
+            product_results = self.vector_store.search_products(
+                query=search_query,
+                top_k=top_k * 2
+            )
+            
+        else:  # general
+            # Light retrieval for general queries
+            browsing_results = self.vector_store.search_browsing(
+                query=query,
+                top_k=3
+            )
+            product_results = self.vector_store.search_products(
+                query=query,
+                top_k=5
+            )
+        
+        # Optional: Boost brands from user profile
         if user_profile and hasattr(user_profile, 'brand_affinity') and user_profile.brand_affinity:
             for p in product_results:
                 if p.get('brand', '').lower() in [b.lower() for b in user_profile.brand_affinity]:
                     p['profile_match'] = True
         
-        logger.info(f"� Found {len(browsing_results)} browsing, {len(product_results)} products")
+        logger.info(f"📊 Found {len(browsing_results)} browsing, {len(product_results)} products")
         
         return browsing_results, product_results
     
@@ -143,7 +250,7 @@ Your response MUST be valid JSON in this exact format:
 
 RULES:
 1. Use ONLY product IDs from the Available Products list
-2. Select 2-4 products that are ACTUALLY relevant to the user's question
+2. Select 4-6 products that are ACTUALLY relevant (or fewer if less are available)
 3. Write personalized reasons based on their browsing history and profile
 4. If no products match the user's request, return an empty selected_products array
 5. Be conversational and helpful in your response"""
@@ -191,7 +298,7 @@ Respond with JSON containing your response and selected product IDs with reasons
             # Create lookup by ID
             product_by_id = {p.get('id', ''): p for p in products}
             
-            for item in selected_items[:4]:
+            for item in selected_items[:6]:  # Show up to 6 products
                 pid = item.get("id", "")
                 reason = item.get("reason", "Recommended for you")
                 
